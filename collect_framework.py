@@ -26,7 +26,7 @@ def parse_cli_function():
 
     parser_cli.add_argument("--string",
                             type=str,
-                            help="file for counting")  # add --sting argument
+                            help="string for counting")  # add --sting argument
 
     cli_args = parser_cli.parse_args()  # getting all arguments in CLI
     if cli_args.file is not None:
@@ -47,7 +47,7 @@ def counting_unique_characters(text: str) -> int:
 
 def main():  # pragma: no cover
     argument_of_cli = parse_cli_function()
-    counter = (counting_unique_characters(argument_of_cli))
+    counter = counting_unique_characters(argument_of_cli)
     response = f'{argument_of_cli}: {counter}'
     print(response)
 

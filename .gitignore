@@ -7,3 +7,6 @@ __pycache__*
 htmlcov
 *.pyc
 .pytest_cache
+
+tempText.txt
+test.txt
