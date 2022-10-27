@@ -45,7 +45,7 @@ def counting_unique_characters(text: str) -> int:
     return len([num for num in counter.values() if num == 1])
 
 
-def main():  # pragma: no cover
+def main():
     argument_of_cli = parse_cli_function()
     counter = counting_unique_characters(argument_of_cli)
     response = f'{argument_of_cli}: {counter}'

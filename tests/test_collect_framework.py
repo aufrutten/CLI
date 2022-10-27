@@ -1,5 +1,5 @@
 import os
-from unittest.mock import Mock
+from unittest.mock import patch, MagicMock
 import pytest
 import collect_framework
 
@@ -16,34 +16,49 @@ class TestCountingUniqueCharacters:
             collect_framework.counting_unique_characters(123)
 
 
+def create_template_file(func):
+    def inner(self):
+        path_to_temp_file = 'tempText.txt'
+        text_of_file_to_write = 'Hello, my name is Test'
+        with open(path_to_temp_file, 'w') as file:
+            file.write(text_of_file_to_write)
+        func(self, file=path_to_temp_file, text=text_of_file_to_write)
+        os.remove(path_to_temp_file)
+    return inner
+
+
 class TestParseCLI:
     """test class  for testing func: 'parse_file' """
-    def test_function_for_parse_file(self):
+
+    @create_template_file
+    def test_function_for_parse_file(self, file, text):
         """function tests 'parse_file', any case which have"""
-
-        # creating file with someone text
-        path_to_temp_file = 'tempText.txt'
-        text_of_file_to_write = """Hello, my name is Ihor"""
-        with open(path_to_temp_file, 'w') as temporary_file:
-            temporary_file.write(text_of_file_to_write)
-            temporary_file.close()
-
         # trying to access a existent file
-        assert collect_framework.parse_file(path_to_temp_file) == text_of_file_to_write,\
-            'input text and file text do not match'
-
+        assert collect_framework.parse_file(file) == text
         # trying to access a non-existent file
         with pytest.raises(FileNotFoundError):
-            name_file_which_not_exist = 'non_existentText.txt'
-            collect_framework.parse_file(name_file_which_not_exist)
+            collect_framework.parse_file('non_existentText.txt')
 
-        # deleting temp file after test
-        os.remove(path_to_temp_file)
-        assert not os.path.isfile(path_to_temp_file), "file hasn't deleted"
-
-    def test_parse_cli_function(self):
+    @create_template_file
+    @patch('collect_framework.argparse.ArgumentParser.parse_args')
+    def test_parse_cli_function(self, mock_parse_args, file, text):
         """test function of 'parse_cli_function' """
-        # collect_framework.parse_cli_function()
+
+        # first case
+        mock_return_value = MagicMock(file=None, string=text)
+        mock_parse_args.return_value = mock_return_value
+        assert collect_framework.parse_cli_function() == text
+
+        # second case
+        mock_return_value = MagicMock(file=file, string=None)
+        mock_parse_args.return_value = mock_return_value
+        assert collect_framework.parse_cli_function() == text
 
 
+class TestMain:
+
+    @patch('collect_framework.parse_cli_function')
+    def test_main_from_collect_framework(self, mock_parse_cli_function):
+        mock_parse_cli_function.return_value = "Hello World!"
+        collect_framework.main()
 
