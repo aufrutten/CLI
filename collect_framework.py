@@ -4,7 +4,7 @@ import argparse
 import os
 
 
-def parse_file(file):
+def parse_file(file: str) -> str:
     """function for parse files, checks if path exists and that is file"""
     if os.path.isfile(file):
         with open(file, 'r') as file:
@@ -13,7 +13,7 @@ def parse_file(file):
         raise FileNotFoundError("file doesn't exist or that is folder")
 
 
-def parse_cli_function():
+def parse_cli_function() -> str:
     """
     function for parse our command line
     function have three priority of return, that is: 1) file 2) text 3) nothing

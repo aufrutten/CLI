@@ -1,4 +1,5 @@
 import os
+import sys
 from unittest.mock import patch, MagicMock
 import pytest
 import collect_framework
@@ -57,8 +58,16 @@ class TestParseCLI:
 
 class TestMain:
 
+    @create_template_file
     @patch('collect_framework.parse_cli_function')
-    def test_main_from_collect_framework(self, mock_parse_cli_function):
-        mock_parse_cli_function.return_value = "Hello World!"
-        collect_framework.main()
+    def test_main_from_collect_framework(self, mock_parse_cli_function, file, text):
+        mock_parse_cli_function.return_value = text  # text = 'Hello, my name is Test'
+        original_stdout = sys.stdout  # saving original sys.stdout
+        with open(file, 'w') as temp_file:
+            sys.stdout = temp_file
+            collect_framework.main()
+            sys.stdout = original_stdout
+        with open(file, 'r') as temp_file:
+            assert temp_file.read() == 'Hello, my name is Test: 9\n'
+
 
